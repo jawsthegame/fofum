@@ -69,7 +69,10 @@ def get_instance(env):
 
   for r in reservations:
     i += 1
-    dns_names[i] = r.instances[0].public_dns_name
+    if r.instances[0].public_dns_name:
+      dns_names[i] = r.instances[0].public_dns_name
+    elif r.instances[0].private_ip_address:
+      dns_names[i] = r.instances[0].private_ip_address
 
   while True:
     instance = get_input_from_choices(
@@ -86,7 +89,7 @@ def main():
 
   display_intro()
   env = get_env()
-  instance = get_instance(env)
+  get_instance(env)
 
 
 if __name__ == "__main__":
