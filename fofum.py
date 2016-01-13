@@ -1,3 +1,4 @@
+import argparse
 import boto
 import commands
 import os
@@ -52,7 +53,7 @@ def get_env():
 
   return env
 
-def get_instance(env):
+def get_instance(env, ssh_args=''):
   resources = commands.getoutput(
     './aws/api/bin/elastic-beanstalk-describe-environment-resources ' + \
       '-e %s 2>/dev/null' \
@@ -79,17 +80,29 @@ def get_instance(env):
       dns_names,
       'instances (%s):' % env, 'instance'
     )
-    os.system('ssh ec2-user@%s' % instance)
+    _ssh(instance, ssh_args)
+
+
+def _ssh(ip='', args=''):
+  user = 'ec2-user'
+  if args:
+    os.system('ssh %s %s@%s' % (args, user, ip))
+  else:
+    os.system('ssh %s@%s' % (user, ip))
+
 
 def main():
   os.putenv(
     'AWS_CREDENTIAL_FILE',
     os.path.expanduser('~/.elasticbeanstalk.cfg')
   )
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-ssh-opts', '--ssh-opts', dest='ssh_args')
+  args = parser.parse_args()
 
   display_intro()
   env = get_env()
-  get_instance(env)
+  get_instance(env, ssh_args=args.ssh_args)
 
 
 if __name__ == "__main__":

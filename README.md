@@ -27,7 +27,7 @@ ssh-add ~/.ec2/development.pem</code></pre>
 
 ###Usage
 
-Once configuration is complete, you can run the script: <code>python fofum.py</code>
+Once configuration is complete, you can run the script.  Your working directory must be the directory fofum.py is in: <code>python fofum.py</code>
 
 You must first select the environment:
 <pre><code>Environments:
@@ -36,7 +36,7 @@ You must first select the environment:
  2 - staging
  3 - development
  0 - Exit
- 
+
 Choose an environment:</code></pre>
 
 Then, the instance:
@@ -47,7 +47,7 @@ Then, the instance:
  3 - my-3rd-instance.compute-1.amazonaws.com
  4 - my-4th-instance.compute-1.amazonaws.com
  0 - Exit
- 
+
 Choose an instance:</code></pre>
 
 You will then be connected to the instance using the ec2-user key you added during configuration.
