@@ -37,34 +37,32 @@ def get_input_from_choices(choices, header, entity):
     os._exit(0)
 
 def get_env():
-  environments = commands.getoutput(
-    './aws/api/bin/elastic-beanstalk-describe-environments 2>/dev/null')
+  beanstalk = boto.connect_beanstalk()
+  envs = beanstalk.describe_environments()\
+    .get('DescribeEnvironmentsResponse')\
+    .get('DescribeEnvironmentsResult')\
+    .get('Environments')
 
-  envs = parse_result(environments)
-  i = 0
-  env_names = {}
-  for env in envs:
-    i += 1
-    env_names[i] = env['EnvironmentName']
+  choices = {i+1: env['EnvironmentName'] for i, env in enumerate(envs)}
 
   env = None
   while not env:
-    env = get_input_from_choices(env_names, 'environments:', 'environment')
+    env = get_input_from_choices(choices, 'environments:', 'environment')
 
   return env
 
 def get_instance(env, ssh_args=''):
-  resources = commands.getoutput(
-    './aws/api/bin/elastic-beanstalk-describe-environment-resources ' + \
-      '-e %s 2>/dev/null' \
-      % env
-  )
+  beanstalk = boto.connect_beanstalk()
+  instances = beanstalk.describe_environment_resources(environment_name=env)\
+    .get('DescribeEnvironmentResourcesResponse')\
+    .get('DescribeEnvironmentResourcesResult')\
+    .get('EnvironmentResources')\
+    .get('Instances')
 
-  info = parse_result(resources)[0]
-  instances = info['Instances'].split(', ')
+  instance_ids = map(lambda i: i['Id'], instances)
 
   ec2 = boto.connect_ec2()
-  reservations = ec2.get_all_instances(instance_ids=instances)
+  reservations = ec2.get_all_instances(instance_ids=instance_ids)
   i = 0
   dns_names = {}
 
