@@ -68,10 +68,10 @@ def get_instance(env, ssh_args=''):
 
   for r in reservations:
     i += 1
-    if r.instances[0].public_dns_name:
-      dns_names[i] = r.instances[0].public_dns_name
-    elif r.instances[0].private_ip_address:
+    if r.instances[0].vpc_id and r.instances[0].private_ip_address:
       dns_names[i] = r.instances[0].private_ip_address
+    else:
+      dns_names[i] = r.instances[0].public_dns_name
 
   while True:
     instance = get_input_from_choices(
